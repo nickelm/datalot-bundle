@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO.Compression;
 using System.Threading;
+using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace DatalotBundler
 {
@@ -15,7 +16,64 @@ namespace DatalotBundler
 
         private static Bundler app;
 
-        public static void bundle()
+        private static string[] filterChatLog(string[] chatLog)
+        {
+            var output = new List<string>();
+
+            // Get the time zone information
+            TimeZoneInfo localZone = TimeZoneInfo.Local;
+            TimeSpan tzOffset = localZone.BaseUtcOffset;
+
+            // Add a header to the chat log
+            output.Add("time,message");
+
+            // Regular expressions
+            Regex dateLine = new Regex(@"^\*\*\* Chat Log Opened: (\w+) (?<month>\w\w\w) (?<day>\d+) (\d\d):(\d\d):(\d\d) (?<year>\d+)$", RegexOptions.Compiled);
+            Regex entryLine = new Regex(@"^\[(?<hour>\d\d):(?<min>\d\d):(?<sec>\d\d)\] (?<msg>.*)$", RegexOptions.Compiled);
+
+            int month = 1, day = 1, year = 2021;
+
+            // Step through each line in the chatlog
+            foreach (var line in chatLog)
+            {
+
+                // Trim the line
+                string trimmedLine = line.Trim();
+
+                // Match to a chat log opening
+                MatchCollection matches = dateLine.Matches(trimmedLine);
+                if (matches.Count > 0)
+                {
+                    month = DateTime.ParseExact(matches[0].Groups["month"].Value, "MMM", CultureInfo.CurrentCulture).Month;
+                    day = Int32.Parse(matches[0].Groups["day"].Value);
+                    year = Int32.Parse(matches[0].Groups["year"].Value);
+                    app.addLine("Chat log recorded " + year.ToString("D4") + "-" + month.ToString("D2") + "-" + day.ToString("D2") +
+                        " (time zone: UTC" + (tzOffset < TimeSpan.Zero ? "-" : "+") + tzOffset.ToString(@"hh\:mm") + ").");
+                    continue;
+                }
+
+                // Match to a timestamp
+                matches = entryLine.Matches(trimmedLine);
+                if (matches.Count > 0)
+                {
+                    // Filter out written communication
+                    var msg = matches[0].Groups["msg"].Value;
+                    if (msg.Contains("'") || msg.Contains("\"") || msg.Contains("@@"))
+                    {
+                        continue;
+                    }
+
+                    // Build the string 
+                    string logEntry = String.Format("{0}-{1}-{2}T{3}:{4}:{5}.000{6}{7},\"{8}\"", year.ToString("D4"), month.ToString("D2"), day.ToString("D2"),
+                        matches[0].Groups["hour"].Value, matches[0].Groups["min"].Value, matches[0].Groups["sec"],
+                        tzOffset < TimeSpan.Zero ? "-" : "+", tzOffset.ToString(@"hh\:mm"), msg);
+                    output.Add(logEntry);
+                }
+            }
+            return output.ToArray();
+        }
+
+        private static void bundle()
         {
             // Extract the bundle name
             string[] args = Environment.GetCommandLineArgs();
@@ -42,19 +100,34 @@ namespace DatalotBundler
                         // Status message
                         app.addLine("Compressing " + logFile + "...");
 
+                        // Get the base name
+                        string entryName = Path.GetFileName(logFile);
+
                         // Read this log file
-                        string fileText = System.IO.File.ReadAllText(logFile);
+                        string[] fileText = System.IO.File.ReadAllLines(logFile);
+                        if (Path.GetExtension(logFile) == ".log")
+                        {
+                            // Filter the chat log
+                            app.addLine("Filtering " + logFile + " from communications...");
+                            fileText = filterChatLog(fileText);
+
+                            // Change the file extension
+                            entryName = Path.ChangeExtension(entryName, ".csv");
+                        }
 
                         // Write it into the archive
-                        string entryName = Path.GetFileName(logFile);
                         var zipArchiveEntry = archive.CreateEntry(entryName, CompressionLevel.Optimal);
                         using (var zipStream = new StreamWriter(zipArchiveEntry.Open()))
                         {
-                            zipStream.Write(fileText);
+                            zipStream.Write(string.Join(Environment.NewLine, fileText));
                         }
                     }
                 }
             }
+
+            // Enable closing the app
+            app.addLine("Bundling completed.");
+            app.setCompleted();
         }
 
         /// <summary>
@@ -72,7 +145,7 @@ namespace DatalotBundler
             var thread = new Thread(bundle);
             thread.Start();
 
-            // Now run it
+            // Now run the application
             Application.Run(app);
         }
     }

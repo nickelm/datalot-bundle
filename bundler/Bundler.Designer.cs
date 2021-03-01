@@ -42,6 +42,7 @@ namespace DatalotBundler
             this.progressLog.Multiline = true;
             this.progressLog.Name = "progressLog";
             this.progressLog.ReadOnly = true;
+            this.progressLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.progressLog.Size = new System.Drawing.Size(491, 162);
             this.progressLog.TabIndex = 1;
             // 
@@ -63,6 +64,7 @@ namespace DatalotBundler
             // 
             // closeButton
             // 
+            this.closeButton.Enabled = false;
             this.closeButton.Location = new System.Drawing.Point(223, 206);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(75, 23);
