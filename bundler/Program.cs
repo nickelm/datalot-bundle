@@ -77,8 +77,17 @@ namespace DatalotBundler
         {
             // Extract the bundle name
             string[] args = Environment.GetCommandLineArgs();
-            if (args.Length < 3) return;
+            if (args.Length < 3)
+            {
+                app.addLine("No command line parameters, nothing to do. Goodbye.");
+                app.setCompleted();
+                return;
+            }
             String archiveName = args[1];
+
+            // Better start by sleeping a little
+            app.addLine("Waiting a second to ensure the game chat log has been closed...");
+            Thread.Sleep(1000);
 
             // If the archive exists, delete it first
             if (File.Exists(archiveName))
