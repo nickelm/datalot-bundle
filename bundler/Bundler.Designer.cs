@@ -29,6 +29,7 @@ namespace DatalotBundler
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Bundler));
             this.progressLog = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.directorySearcher1 = new System.DirectoryServices.DirectorySearcher();
@@ -80,6 +81,7 @@ namespace DatalotBundler
             this.ClientSize = new System.Drawing.Size(528, 238);
             this.Controls.Add(this.closeButton);
             this.Controls.Add(this.groupBox1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Bundler";
             this.Text = "Datalot Bundler";
             this.groupBox1.ResumeLayout(false);

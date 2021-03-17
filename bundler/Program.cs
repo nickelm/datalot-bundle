@@ -13,6 +13,8 @@ namespace DatalotBundler
 
     static class Program
     {
+        public const string Version = "0.1.1";
+        public const string BuildDate = "March 17, 2020";
 
         private static Bundler app;
 
@@ -75,67 +77,77 @@ namespace DatalotBundler
 
         private static void bundle()
         {
-            // Extract the bundle name
-            string[] args = Environment.GetCommandLineArgs();
-            if (args.Length < 3)
+            try
             {
-                app.addLine("No command line parameters, nothing to do. Goodbye.");
-                app.setCompleted();
-                return;
-            }
-            String archiveName = args[1];
+                app.addLine("Welcome to DatalotBundler version " + Version + " (Build date " + BuildDate + ").");
 
-            // Better start by sleeping a little
-            app.addLine("Waiting a second to ensure the game chat log has been closed...");
-            Thread.Sleep(1000);
-
-            // If the archive exists, delete it first
-            if (File.Exists(archiveName))
-            {
-                app.addLine("Archive " + archiveName + " already exists, deleting it.");
-                File.Delete(archiveName);
-            }
-
-            // Create the new archive
-            app.addLine("Creating archive " + archiveName + "...");
-            using (var fileStream = new FileStream(archiveName, FileMode.CreateNew))
-            {
-                using (var archive = new ZipArchive(fileStream, ZipArchiveMode.Create, true))
+                // Extract the bundle name
+                string[] args = Environment.GetCommandLineArgs();
+                if (args.Length < 3)
                 {
-                    // Step through the log files
-                    string[] logs = args.Skip(2).ToArray();
-                    foreach (var logFile in logs)
+                    app.addLine("No command line parameters, nothing to do. Goodbye.");
+                    app.setCompleted();
+                    return;
+                }
+                String archiveName = args[1];
+
+                // Better start by sleeping a little
+                app.addLine("Waiting a second to ensure the game chat log has been closed...");
+                Thread.Sleep(1000);
+
+                // If the archive exists, delete it first
+                if (File.Exists(archiveName))
+                {
+                    app.addLine("Archive " + archiveName + " already exists, deleting it.");
+                    File.Delete(archiveName);
+                }
+
+                // Create the new archive
+                app.addLine("Creating archive " + archiveName + "...");
+                using (var fileStream = new FileStream(archiveName, FileMode.CreateNew))
+                {
+                    using (var archive = new ZipArchive(fileStream, ZipArchiveMode.Create, true))
                     {
-                        // Status message
-                        app.addLine("Compressing " + logFile + "...");
-
-                        // Get the base name
-                        string entryName = Path.GetFileName(logFile);
-
-                        // Read this log file
-                        string[] fileText = System.IO.File.ReadAllLines(logFile);
-                        if (Path.GetExtension(logFile) == ".log")
+                        // Step through the log files
+                        string[] logs = args.Skip(2).ToArray();
+                        foreach (var logFile in logs)
                         {
-                            // Filter the chat log
-                            app.addLine("Filtering " + logFile + " from communications...");
-                            fileText = filterChatLog(fileText);
+                            // Status message
+                            app.addLine("Compressing " + logFile + "...");
 
-                            // Change the file extension
-                            entryName = Path.ChangeExtension(entryName, ".csv");
-                        }
+                            // Get the base name
+                            string entryName = Path.GetFileName(logFile);
 
-                        // Write it into the archive
-                        var zipArchiveEntry = archive.CreateEntry(entryName, CompressionLevel.Optimal);
-                        using (var zipStream = new StreamWriter(zipArchiveEntry.Open()))
-                        {
-                            zipStream.Write(string.Join(Environment.NewLine, fileText));
+                            // Read this log file
+                            string[] fileText = System.IO.File.ReadAllLines(logFile);
+                            if (Path.GetExtension(logFile) == ".log")
+                            {
+                                // Filter the chat log
+                                app.addLine("Filtering " + logFile + " from communications...");
+                                fileText = filterChatLog(fileText);
+
+                                // Change the file extension
+                                entryName = Path.ChangeExtension(entryName, ".csv");
+                            }
+
+                            // Write it into the archive
+                            var zipArchiveEntry = archive.CreateEntry(entryName, CompressionLevel.Optimal);
+                            using (var zipStream = new StreamWriter(zipArchiveEntry.Open()))
+                            {
+                                zipStream.Write(string.Join(Environment.NewLine, fileText));
+                            }
                         }
                     }
                 }
-            }
 
-            // Enable closing the app
-            app.addLine("Bundling completed.");
+                // Enable closing the app
+                app.addLine("Bundling completed.");
+            }
+            catch (Exception e)
+            {
+                app.addLine("Error: " + e);
+                app.addLine("Exiting...");
+            }
             app.setCompleted();
         }
 
