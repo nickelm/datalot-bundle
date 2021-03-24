@@ -34,6 +34,9 @@ namespace DatalotBundler
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.directorySearcher1 = new System.DirectoryServices.DirectorySearcher();
             this.closeButton = new System.Windows.Forms.Button();
+            this.uploadButton = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.apiKeyBox = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -66,7 +69,7 @@ namespace DatalotBundler
             // closeButton
             // 
             this.closeButton.Enabled = false;
-            this.closeButton.Location = new System.Drawing.Point(223, 206);
+            this.closeButton.Location = new System.Drawing.Point(435, 206);
             this.closeButton.Name = "closeButton";
             this.closeButton.Size = new System.Drawing.Size(75, 23);
             this.closeButton.TabIndex = 0;
@@ -74,11 +77,40 @@ namespace DatalotBundler
             this.closeButton.UseVisualStyleBackColor = true;
             this.closeButton.Click += new System.EventHandler(this.closeButton_Click);
             // 
+            // uploadButton
+            // 
+            this.uploadButton.Location = new System.Drawing.Point(354, 206);
+            this.uploadButton.Name = "uploadButton";
+            this.uploadButton.Size = new System.Drawing.Size(75, 23);
+            this.uploadButton.TabIndex = 3;
+            this.uploadButton.Text = "Upload";
+            this.uploadButton.UseVisualStyleBackColor = true;
+            this.uploadButton.Click += new System.EventHandler(this.uploadButton_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(20, 209);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(45, 13);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "API Key";
+            // 
+            // apiKeyBox
+            // 
+            this.apiKeyBox.Location = new System.Drawing.Point(71, 206);
+            this.apiKeyBox.Name = "apiKeyBox";
+            this.apiKeyBox.Size = new System.Drawing.Size(277, 20);
+            this.apiKeyBox.TabIndex = 5;
+            // 
             // Bundler
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(528, 238);
+            this.Controls.Add(this.apiKeyBox);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.uploadButton);
             this.Controls.Add(this.closeButton);
             this.Controls.Add(this.groupBox1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -87,6 +119,7 @@ namespace DatalotBundler
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -96,6 +129,9 @@ namespace DatalotBundler
         private System.Windows.Forms.GroupBox groupBox1;
         private System.DirectoryServices.DirectorySearcher directorySearcher1;
         private System.Windows.Forms.Button closeButton;
+        private System.Windows.Forms.Button uploadButton;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox apiKeyBox;
     }
 }
 

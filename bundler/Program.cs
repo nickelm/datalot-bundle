@@ -7,6 +7,7 @@ using System.IO.Compression;
 using System.Threading;
 using System.Text.RegularExpressions;
 using System.Globalization;
+using System.Net.Http;
 
 namespace DatalotBundler
 {
@@ -18,7 +19,7 @@ namespace DatalotBundler
 
         private static Bundler app;
 
-        private static string[] filterChatLog(string[] chatLog)
+        private static string[] FilterChatLog(string[] chatLog)
         {
             var output = new List<string>();
 
@@ -75,7 +76,7 @@ namespace DatalotBundler
             return output.ToArray();
         }
 
-        private static void bundle()
+        private static void Bundle()
         {
             try
             {
@@ -124,7 +125,7 @@ namespace DatalotBundler
                             {
                                 // Filter the chat log
                                 app.addLine("Filtering " + logFile + " from communications...");
-                                fileText = filterChatLog(fileText);
+                                fileText = FilterChatLog(fileText);
 
                                 // Change the file extension
                                 entryName = Path.ChangeExtension(entryName, ".csv");
@@ -163,7 +164,7 @@ namespace DatalotBundler
             app = new Bundler();
 
             // Start the bundling thread
-            var thread = new Thread(bundle);
+            var thread = new Thread(Bundle);
             thread.Start();
 
             // Now run the application
