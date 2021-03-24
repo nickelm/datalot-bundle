@@ -79,6 +79,7 @@ namespace DatalotBundler
             // 
             // uploadButton
             // 
+            this.uploadButton.Enabled = false;
             this.uploadButton.Location = new System.Drawing.Point(354, 206);
             this.uploadButton.Name = "uploadButton";
             this.uploadButton.Size = new System.Drawing.Size(75, 23);
@@ -102,6 +103,7 @@ namespace DatalotBundler
             this.apiKeyBox.Name = "apiKeyBox";
             this.apiKeyBox.Size = new System.Drawing.Size(277, 20);
             this.apiKeyBox.TabIndex = 5;
+            this.apiKeyBox.TextChanged += new System.EventHandler(this.apiKeyBox_TextChanged);
             // 
             // Bundler
             // 
@@ -116,6 +118,8 @@ namespace DatalotBundler
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Bundler";
             this.Text = "Datalot Bundler";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Bundler_FormClosing);
+            this.Load += new System.EventHandler(this.Bundler_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
